@@ -142,7 +142,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", 
     "http://127.0.0.1:8000", 
     "https://web-production-da63.up.railway.app",
-    "https://web-production-da63.up.railway.app/tasks/api/v1/tasks"
     "http://localhost:8000", 
     "http://127.0.0.1:5173",
 ]
