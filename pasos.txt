@@ -1,0 +1,211 @@
+1 instalo virtualenv
+pip install virtualenv
+
+2 creo el entorno(carpeta)
+python -m virtualenv venvrest
+
+3 activo el entorno(carpeta)
+venvrest\Scripts\activae
+
+4 Abro VSC desde el CMD
+code . 
+
+5 Selecciono el intérprete
+
+6 ctrl + ñ
+
+7 Instalo Django
+pip install django
+
+9 creo el proyecto dentro de la misma carpeta .
+django-admin startproject django_crud_api .
+
+10 inicio el server
+python manage.py runserver
+
+11 ahora creamos una aplicación
+python manage.py startapp tasks
+
+12 en settings agrego mi app
+'tasks'
+
+13 Ejecutamos las migraciones para crear la BD
+python manage.py migrate
+
+14 abro DB BROWSER para ver la BD
+
+8 Instalo Djan REST framework
+pip install djangorestframework
+(para que se conecte el backend con el frontend sin problema)
+pip install django-cors-headers
+
+12 en settings agrego mi app
+'rest_framework'
+'corsheaders'
+
+13 en Middleware
+
+"corsheaders.middleware.CorsMiddleware",
+"django.middleware.common.CommonMiddleware",
+
+#autorización cors para comunicación entre backends
+CORS_ALLOWED_ORIGINS = [
+    "https://example.com",
+    "https://sub.example.com",
+    "http://localhost:8080",
+    "http://127.0.0.1:9000",
+]
+al final se pone
+
+agremos la clase Task para la BD
+makemig..
+migrate
+
+Creando el superuser
+python manage.py createsuperuser
+
+ahora para ver el modelo en el admin vamos a editar el archivo admin.py
+from .models import Task
+# Register your models here.
+admin.site.register(Task)
+
+15 Creamos el archivo serializers.py en 'tasks' para 
+Un serializador en DRF es una clase que traduce instancias de modelos y otros tipos de datos en Python a formatos de datos que puedan ser fácilmente renderizados en diferentes formatos, como JSON, XML, etc., y viceversa. 
+Ahí le digo qué campos puede usar para que luego los convierte a JSON
+
+from rest_framework import serializers
+from .models import Task
+
+class TaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        # fields = ('id', 'title', 'description', 'done')
+        fields = '__all__'
+
+Luego vamos a views y ahí importamos para manejar la CRUD de task
+
+from rest_framework import viewsets
+from .serializer import TaskSerializer
+from .models import Task
+
+# Create your views here.
+class TaskView(viewsets.ModelViewSet):
+    serializer_class = TaskSerializer
+    queryset = Task.objects.all()
+
+17 Creamos el archivo urls.py
+para definir las rutas
+from django.urls import include, path
+from rest_framework import routers
+from tasks import views
+
+router = routers.DefaultRouter()
+router.register(r"tasks", views.TaskView, "tasks")
+
+#esto está genrando las rutas GET, POST, PUT, DELETE.
+urlpatterns = [
+    path("api/v1/", include(router.urls)),
+]
+
+
+18 Ahora importamos las rutas creadas en el proyecto
+abrimos el archivo urls.py del proyecto y ahí declaramos el path
+actualizamos la web y ahora ya lo vemos diferente.
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path('tasks/', include('tasks.urls')),
+    
+]
+
+
+
+
+http://127.0.0.1:8000/tasks/api/v1/tasks/
+
+19 Instalé una extensión llamada Thunder client y ahí hice una petición POST a la ruta de localhost...y funcionó
+
+20 vamos a desplegarlo en producción
+-creamos el archivo .gitignore para indicar qué archivos queremos que NO se suba
+db.sqlite3
+venvrest
+__pycache__
+- git init
+- git add .
+- git commit -m "primer commit"
+
+21 entramos a settings.py e importamos os
+https://render.com/docs/deploy-django
+- import os
+- SECRET_KEY = os.environ.get('SECRET_KEY', default='your secret key')
+- DEBUG = 'RENDER' not in os.environ
+- RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+- Creamos la BD en PostgreSQL
+drfjhonpg
+drfjhonpg
+- ahora instalo pip install dj-database-url psycopg2-binary
+- importo import dj_database_url
+- agrego la bd
+DATABASES = {
+    'default': dj_database_url.config(
+        # Feel free to alter this value to suit your needs.
+        default='postgresql://postgres:postgres@localhost:5432/mysite',
+        conn_max_age=600
+    )
+}
+- Para los archivos statics 
+pip install whitenoise[brotli]
+- le agregamos esto en MIDDLEWARE
+'whitenoise.middleware.WhiteNoiseMiddleware',
+- Agremos esto debajo de static
+if not DEBUG:
+    # Tell Django to copy statics to the `staticfiles` directory
+    # in your application directory on Render.
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+    # Turn on WhiteNoise storage backend that takes care of compressing static files
+    # and creating unique names for each version so they can safely be cached forever.
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+- Creamos el archivo build.sh para que ejecute los comandos
+build.sh y dentro pegamos esto:
+
+#!/usr/bin/env bash
+# exit on error
+set -o errexit
+
+pip install -r requirements.txt
+
+python manage.py collectstatic --no-input
+python manage.py migrate
+
+ahora debemos crear el archivo requirements
+- pip freeze > requirements.txt
+ese archivo tendrá los paquetes que hemos usado para desarrollar la aplicación y que deben
+ser instalados para que funcione correctamente, esto debe estar en el archivo build.sh
+
+- ahora debemos darle permisos a ese archivo, pero eso se hace desde gitbash, lo abrimos entonces
+chmod a+x build.sh
+ls para comprobar que build.sh aparece en verde que indica que es un ejecutable
+
+- ahora instalamos pip install gunicorn
+- debemos agregarlo a requirements
+pip freeze > requirements.txt
+- git status
+- git add .
+- git commit -m "listo para render"
+- git branch -M main
+- git remote add origin https://github.com/jhoncorrea/djangorest.git
+- git push -u origin main
+
+ahora en render en BUIL COMMAND le damos esto
+./build.sh
+en START COMMAND
+gunicorn drfsimplecrud.wsgi
+
+Luego agregaremos VARIABLES DE ENTORNO
+DATABASE_URL postgres://drfjhonpg_user:Its5ycFTrcqHapG6pjEHhlcSvTwuNiUH@dpg-cisse9diuie5ebcbc6j0-a/drfjhonpg
+PYTHON_VERSION 3.10.0
