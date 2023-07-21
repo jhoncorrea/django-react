@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-!rwx-e0pje3+wlq7vvsdnxn#r!_qp&z4jrs**@m7q59vvih%-d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "web-production-da63.up.railway.app"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'whitenoise.runserver_nostatic',
     'corsheaders',
     'rest_framework',
     'coreapi',
@@ -129,13 +130,15 @@ STATICFILES_DIRS = [
   os.path.join(BASE_DIR, "client", "dist")
 ]
 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #autorización cors para comunicación entre backends
-CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:5173"]
+CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
 
 
 
@@ -144,6 +147,6 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 CSRF_TRUSTED_ORIGINS = ["http://*", "https://web-production-da63.up.railway.app"]
