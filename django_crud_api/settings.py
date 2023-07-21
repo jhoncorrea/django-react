@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-!rwx-e0pje3+wlq7vvsdnxn#r!_qp&z4jrs**@m7q59vvih%-d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "web-production-da63.up.railway.app"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "web-production-da63.up.railway.app"]
 
 
 # Application definition
@@ -63,7 +63,7 @@ ROOT_URLCONF = 'django_crud_api.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, "client", "dist")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'django_crud_api.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(default="sqlite://db.sqlite3")
+    'default': dj_database_url.config(default="sqlite:///" + os.path.join(BASE_DIR, "db.sqlite3"))
 }
 
 
@@ -124,6 +124,11 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+STATICFILES_DIRS = [
+  # Tell Django where to look for React's static files (css, js)
+  os.path.join(BASE_DIR, "client", "dist")
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -141,4 +146,4 @@ REST_FRAMEWORK = {
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-CSRF_TRUSTED_ORIGINS = ["http://*", "https://https://web-production-da63.up.railway.app"]
+CSRF_TRUSTED_ORIGINS = ["http://*", "https://web-production-da63.up.railway.app"]

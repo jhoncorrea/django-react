@@ -1,10 +1,16 @@
 //importo la libreria axios para hacer consultas http
 import axios from 'axios';
 
-//creo una const con la ruta de la api
+const URL =
+  process.env.NODE_ENV === "production"
+    ? import.meta.env.VITE_BACKEND_URL
+    : "http://127.0.0.1:8000";
+
+console.log(URL);
 const tasksApi = axios.create({
-    baseURL: 'http://127.0.0.1:8000/tasks/api/v1/tasks/'
-})
+  baseURL: `${URL}/tasks/api/v1/tasks/`,
+});
+
 
 export const getAllTasks = () => {
     //como no estoy haciendo nada antes del return lo podría quitar
